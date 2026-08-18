@@ -1,0 +1,13 @@
+# 只启用雾凇全拼；左 Shift 在鼠须管内部切换中文与英文。
+patch:
+  schema_list:
+    - schema: rime_ice
+  menu/page_size: 7
+  switcher/fold_options: false
+  ascii_composer/good_old_caps_lock: true
+  ascii_composer/switch_key:
+    Caps_Lock: clear
+    Shift_L: commit_code
+    Shift_R: noop
+    Control_L: noop
+    Control_R: noop

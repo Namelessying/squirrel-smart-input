@@ -1,0 +1,101 @@
+# 公开安全版：只依赖公开词库，不包含或读取任何个人词典。
+patch:
+  "switches/@2/reset": 0
+  "switches/+":
+    - name: prediction
+      states: [联想关, 联想开]
+      reset: 1
+    - name: cloud_input
+      states: [离线, 云候选]
+      reset: 0
+  "pin_cand_filter/+":
+    - "no\tの"
+  schema/dependencies:
+    - melt_eng
+    - radical_pinyin
+    - typo_corrections
+  translator/dictionary: rime_ice
+  translator/user_dict: rime_ice
+  translator/enable_user_dict: true
+  translator/enable_sentence: true
+  translator/keep_comments: true
+  translator/contextual_suggestions: false
+  translator/max_homophones: 8
+  grammar:
+    language: wanxiang-lts-zh-hans
+    collocation_max_length: 6
+    collocation_min_length: 3
+    collocation_penalty: -14
+    non_collocation_penalty: -6
+    weak_collocation_penalty: -100
+    rear_penalty: -20
+  user_predict:
+    db_name: predict
+    mobile_predict_style: post
+    enable_fallback_reorder: false
+    max_candidates: 7
+    max_predictions: 3
+    max_memory_branches: 15
+    context_timeout: 8000
+  melt_eng/dictionary: melt_eng
+  melt_eng/user_dict: melt_eng
+  melt_eng/enable_user_dict: true
+  typo_lookup:
+    dictionary: typo_corrections
+    enable_user_dict: false
+    enable_sentence: false
+    enable_completion: false
+    initial_quality: 5.0
+  "speller/algebra/+":
+    - "derive/^([qjx])ia$/$1ai/correction"
+    - "derive/([wrtypsdfghklzcbnm])an$/$1na/correction"
+    - "derive/([wrpsdfghklzcbnm])en$/$1ne/correction"
+    - "derive/([qypjlxbnm])in$/$1ni/correction"
+    - "derive/([qrtysdghjklzxc])un$/$1nu/correction"
+    - "derive/([qtpdjlxbnm])ian$/$1ain/correction"
+  engine/processors:
+    - lua_processor@*wanxiang.user_predict*P
+    - lua_processor@*select_character
+    - lua_processor@*quick_memory_processor
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  engine/translators:
+    - punct_translator
+    - lua_translator@*no_kana_translator
+    - lua_translator@*privacy_cloud_sogou
+    - lua_translator@*quick_memory_translator
+    - table_translator@typo_lookup
+    - script_translator
+    - lua_translator@*wanxiang.user_predict*T
+    - lua_translator@*date_translator
+    - lua_translator@*lunar
+    - lua_translator@*uuid
+    - table_translator@custom_phrase
+    - table_translator@melt_eng
+    - table_translator@cn_en
+    - table_translator@radical_lookup
+    - lua_translator@*unicode
+    - lua_translator@*number_translator
+    - lua_translator@*calc_translator
+    - lua_translator@*force_gc
+  engine/filters:
+    - lua_filter@*wanxiang.user_predict*F
+    - lua_filter@*corrector
+    - lua_filter@*typo_hint_filter
+    - reverse_lookup_filter@radical_reverse_lookup
+    - lua_filter@*autocap_filter
+    - lua_filter@*v_filter
+    - lua_filter@*pin_cand_filter
+    - lua_filter@*long_word_filter
+    - lua_filter@*quick_memory_filter
+    - lua_filter@*reduce_english_filter
+    - simplifier@emoji
+    - simplifier@traditionalize
+    - lua_filter@*search@radical_pinyin
+    - uniquifier

@@ -1,0 +1,13 @@
+# 保留雾凇配色，候选窗口横排 7 个，并缩放到默认尺寸的 90%。
+patch:
+  show_notifications_when: never
+  style/candidate_list_layout: linear
+  style/text_orientation: horizontal
+  "preset_color_schemes/purity_of_form_custom/candidate_list_layout": linear
+  "preset_color_schemes/purity_of_form_custom/text_orientation": horizontal
+  "preset_color_schemes/purity_of_form_custom/font_point": 16.2
+  "preset_color_schemes/purity_of_form_custom/label_font_point": 10.8
+  "preset_color_schemes/purity_of_form_custom/comment_font_point": 14.4
+  "preset_color_schemes/purity_of_form_custom/corner_radius": 9
+  "preset_color_schemes/purity_of_form_custom/line_spacing": 4.5
+  "preset_color_schemes/purity_of_form_custom/spacing": 9
