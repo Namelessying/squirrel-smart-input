@@ -1,10 +1,8 @@
--- 本地快速记忆：一次选择后，把该词在相同编码及首字母编码下强力置前。
+-- 本地快速记忆：多字词先进入第二位，累计选满三次后置顶。
 local M = {
     loaded = false,
     data = {},
     tick = 0,
-    last_signature = "",
-    last_record_time = 0,
 }
 
 local function clean_code(code)
@@ -80,14 +78,6 @@ end
 
 function M.record_selection(raw_code, text, preedit)
     M.load()
-    local signature = clean_code(raw_code) .. "\t" .. (text or "")
-    local current_time = rime_api.get_time_ms and rime_api.get_time_ms() or os.time() * 1000
-    if signature == M.last_signature and current_time - M.last_record_time < 250 then
-        return false
-    end
-    M.last_signature = signature
-    M.last_record_time = current_time
-
     local codes = {}
     codes[clean_code(raw_code)] = true
 
@@ -149,13 +139,14 @@ function M.remove_by_text(text)
 end
 
 function M.score(item)
-    return item.count * 1000000000 + item.tick
+    -- 最近一次明确选择优先；次数仅在时间相同时破同分。
+    return item.tick * 1000000 + math.min(item.count, 999999)
 end
 
--- 汉字单字选过一次即视为强偏好；多字词仍需两次，防止误选压过云候选。
+-- 单字保留一次置顶；多字词累计选满三次才成为首选。
 function M.is_strong(text, item)
     local count = item and item.count or 0
-    return count >= 2 or (count >= 1 and is_single_han(text))
+    return count >= 3 or (count >= 1 and is_single_han(text))
 end
 
 return M

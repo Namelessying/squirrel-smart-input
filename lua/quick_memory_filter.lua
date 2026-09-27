@@ -1,6 +1,4 @@
--- 渐进式本地学习：
--- 选过一次的词移动到原候选前两名之后；选过两次及以上则直接置前。
--- 次数优先，最近使用时间用于破同分。
+-- 多字词选一、两次排第二；选到第三次后排第一。
 local store = require("quick_memory_store")
 local M = {}
 
@@ -43,21 +41,16 @@ function M.func(input, env)
         yield(cand)
     end
 
-    -- 两次以上的明确偏好永远排在云候选之前。
-    for _, item in ipairs(strong) do emit(item.cand) end
-
-    -- 保留原排序最靠前的两个候选，避免一次误选立刻压掉搜狗首选。
-    local guarded = 0
-    for _, cand in ipairs(all) do
-        local item = remembered[cand.text]
-        if not item or not store.is_strong(cand.text, item) then
-            emit(cand)
-            guarded = guarded + 1
-            if guarded >= 2 then break end
-        end
+    -- 已建立的首选保持第一；没有时保留原本的第一候选。
+    if #strong > 0 then
+        emit(strong[1].cand)
+    elseif #all > 0 then
+        emit(all[1])
     end
 
-    -- 一次选择的词进入首屏，排在上述两个候选之后。
+    -- 最新的一、两次选择在第二位，其余已有偏好随后排列。
+    if #weak > 0 then emit(weak[1].cand) end
+    for _, item in ipairs(strong) do emit(item.cand) end
     for _, item in ipairs(weak) do emit(item.cand) end
     for _, cand in ipairs(all) do emit(cand) end
 end

@@ -1,4 +1,4 @@
--- 空格即时记录；其他选词在实际上屏时记录，避免翻页数字键误记候选。
+-- 所有选词都在实际上屏时记录一次，避免重复通知和翻页数字键误记。
 local store = require("quick_memory_store")
 local M = {}
 
@@ -31,14 +31,6 @@ function M.func(key, env)
     if repr == "Control+Delete" or repr == "Shift+Delete" then
         local selected = context:get_selected_candidate()
         if selected then store.remove_by_text(selected.text) end
-        return 2
-    end
-
-    if repr == "space" then
-        local cand = context:get_selected_candidate()
-        if cand then
-            store.record_selection(context.input, cand.text, cand.preedit or "")
-        end
         return 2
     end
 
